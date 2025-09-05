@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: Manager
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: YouTube_Account_Manager
+      auto-index-creation: true
