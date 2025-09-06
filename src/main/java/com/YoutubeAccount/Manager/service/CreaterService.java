@@ -43,6 +43,21 @@ public class CreaterService {
         return userRepository.findById(id).orElse(null);
     }
 
+    //Delete user by Id
+    public boolean deleteUserById(String id){
+        Users user = userRepository.findById(id).orElse(null);
+        if(user == null){
+            return false;
+        }
+        userRepository.deleteById(id);
+        return true;
+    }
+
+    //Delete all user
+    public boolean deleteAll(){
+        userRepository.deleteAll();
+        return true;
+    }
     public String greet(){
         return "What a sunny day !!!";
     }

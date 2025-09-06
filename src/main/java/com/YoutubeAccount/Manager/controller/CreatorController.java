@@ -41,12 +41,25 @@ public class CreatorController {
     @GetMapping("/getById/{id}")
     public ResponseEntity<?> getById(@PathVariable String id){
         Users user = createrService.findUserById(id);
-        if(user != null){
-            return new ResponseEntity<>(user,HttpStatus.FOUND);
+        if(user != null) {
+            return new ResponseEntity<>(user, HttpStatus.FOUND);
         }
-
         return new ResponseEntity<>("User Not Found", HttpStatus.NOT_FOUND);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable String id){
+        if(createrService.deleteUserById(id)){
+            return new ResponseEntity<>("User Deleted Successfully", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+    }
 
+    @DeleteMapping("/delete/all")
+    public ResponseEntity<?> deleteAll(){
+        if(createrService.deleteAll()){
+            return new ResponseEntity<>("All users deleted", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("No users found in database", HttpStatus.NOT_FOUND);
+    }
 }
