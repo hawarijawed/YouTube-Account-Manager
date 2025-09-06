@@ -62,4 +62,14 @@ public class CreatorController {
         }
         return new ResponseEntity<>("No users found in database", HttpStatus.NOT_FOUND);
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateUser(@RequestBody Users user, @PathVariable String id){
+        Users updatedUser = createrService.updateUser(user, id);
+        if(updatedUser == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(updatedUser);
+    }
 }

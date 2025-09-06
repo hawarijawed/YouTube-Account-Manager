@@ -58,6 +58,43 @@ public class CreaterService {
         userRepository.deleteAll();
         return true;
     }
+
+    //Update user
+    public Users updateUser(Users user, String id){
+        Users existingUser = userRepository.findById(id).orElse(null);
+        if(existingUser != null){
+            if(user.getUsername() != null){
+                existingUser.setUsername(user.getUsername());
+            }
+            if(user.getFullname() != null){
+                existingUser.setFullname(user.getFullname());
+            }
+
+            if(user.getEmail() != null){
+                existingUser.setEmail(user.getEmail());
+            }
+
+            if(user.getBio() != null){
+                existingUser.setBio(user.getBio());
+            }
+
+            if(user.getRole() != null){
+                existingUser.setRole(user.getRole());
+            }
+
+            if(user.getContact() != null){
+                existingUser.setContact(user.getContact());
+            }
+
+            if(user.getPassword() != null){
+                existingUser.setPassword(user.getPassword());
+            }
+
+            return userRepository.save(existingUser);
+        }
+
+        return  null;
+    }
     public String greet(){
         return "What a sunny day !!!";
     }
