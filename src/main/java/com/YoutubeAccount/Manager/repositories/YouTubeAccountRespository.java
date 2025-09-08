@@ -4,6 +4,7 @@ import com.YoutubeAccount.Manager.models.YouTubeAccount;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface YouTubeAccountRespository extends MongoRepository<YouTubeAccount, String> {
     //Find all Youtube from user id
@@ -14,4 +15,6 @@ public interface YouTubeAccountRespository extends MongoRepository<YouTubeAccoun
 
     //Delete all accounts for a user (if needed)
     void deleteByUserId(String userId);
+
+    Optional<Object> findByUserIdAndChannelId(String userId, String channelId);
 }
