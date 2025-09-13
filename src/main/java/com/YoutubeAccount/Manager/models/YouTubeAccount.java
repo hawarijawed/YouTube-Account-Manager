@@ -22,7 +22,6 @@ public class YouTubeAccount {
     private String id;
 
     private String userId;//reference for user._id
-    private String channelId;
     private String channelName;
     //private String profilePic;
     private long subscribers;

@@ -2,6 +2,7 @@ package com.YoutubeAccount.Manager.service;
 
 import com.YoutubeAccount.Manager.models.VideoManagement;
 import com.YoutubeAccount.Manager.repositories.VideoManagementRepository;
+import com.YoutubeAccount.Manager.repositories.YouTubeAccountRespository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,15 +15,20 @@ import java.util.List;
 public class VideoManagementServices {
     @Autowired
     private final VideoManagementRepository videoManagementRepository;
-
+    @Autowired
+    private final YouTubeAccountRespository youTubeAccountRespository;
     @Autowired
     private final MongoTemplate mongoTemplate;
-    public VideoManagementServices(VideoManagementRepository video, MongoTemplate template){
+    public VideoManagementServices(VideoManagementRepository video, MongoTemplate template, YouTubeAccountRespository youtube){
         this.videoManagementRepository = video;
         this.mongoTemplate = template;
+        this.youTubeAccountRespository = youtube;
     }
 
     public boolean saveVideo(VideoManagement video){
+        if(!youTubeAccountRespository.existsById(video.getYoutubeAccountId())){
+            return false;
+        }
         videoManagementRepository.save(video);
         return  true;
     }
@@ -38,6 +44,9 @@ public class VideoManagementServices {
         return  mongoTemplate.find(query, VideoManagement.class);
     }
 
+    public List<VideoManagement> getAll(){
+        return videoManagementRepository.findAll();
+    }
     public boolean deleteById(String id){
         videoManagementRepository.deleteById(id);
         return true;
