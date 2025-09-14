@@ -3,6 +3,8 @@ package com.YoutubeAccount.Manager.service;
 import com.YoutubeAccount.Manager.models.Users;
 import com.YoutubeAccount.Manager.repositories.UserRepository;
 import java.util.Collections;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class CreaterService {
     @Autowired
@@ -23,6 +25,10 @@ public class CreaterService {
     }
 
     public boolean saveUser (Users user){
+        if(userRepository.existsById(user.getId())){
+            log.warn("User with id {} already exists ",user.getId());
+            return false;
+        }
         userRepository.save(user);
         Optional<Users> use = userRepository.findById(user.getId());
         if(!use.isEmpty()){

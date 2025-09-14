@@ -10,11 +10,9 @@ public interface YouTubeAccountRespository extends MongoRepository<YouTubeAccoun
     //Find all Youtube from user id
     List<YouTubeAccount> findByUserId(String userId);
 
-    //Find Youtube account from channelId
-    YouTubeAccount findByChannelId(String channelId);
 
     //Delete all accounts for a user (if needed)
     void deleteByUserId(String userId);
 
-    Optional<Object> findByUserIdAndChannelId(String userId, String channelId);
+
 }

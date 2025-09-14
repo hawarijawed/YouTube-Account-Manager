@@ -52,6 +52,14 @@ public class VideoManagementServices {
         return true;
     }
 
+    //Delete all video for a channel
+    public boolean deleteAll(String accountId){
+        Criteria criteria = new Criteria();
+        Query query = new Query();
+        query.addCriteria(criteria.where("youtubeAccountId").is(accountId));
+        mongoTemplate.remove(query, VideoManagement.class);
+        return true;
+    }
     public boolean likeVideo(String id){
         VideoManagement video = videoManagementRepository.findById(id).orElse(null);
         if(video == null){

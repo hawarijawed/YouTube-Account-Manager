@@ -24,7 +24,7 @@ public class YouTubeAccount {
     private String userId;//reference for user._id
     private String channelName;
     //private String profilePic;
-    private long subscribers;
+    private long subscribers=0;
 
     @CreatedDate
     private LocalDateTime createdAt;

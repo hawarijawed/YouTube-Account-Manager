@@ -27,7 +27,7 @@ public class VideoManagementController {
         return videoManagementServices.getVideoById(id);
     }
 
-    @GetMapping("/get/channel/{channelId}")
+    @GetMapping("/get/channel/{channelId}")//channel id refers to account id
     public ResponseEntity<?> getVideoByChannel(@PathVariable String channelId){
         List<VideoManagement> video = videoManagementServices.getVideoByAccount(channelId);
         if(video.isEmpty()){
@@ -55,5 +55,7 @@ public class VideoManagementController {
 
         return new ResponseEntity<>("Account not found", HttpStatus.BAD_REQUEST);
     }
+
+
 }
 
