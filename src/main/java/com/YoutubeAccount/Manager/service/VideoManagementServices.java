@@ -29,6 +29,9 @@ public class VideoManagementServices {
         if(!youTubeAccountRespository.existsById(video.getYoutubeAccountId())){
             return false;
         }
+        if(videoManagementRepository.existsById(video.getId())){
+            return false;
+        }
         videoManagementRepository.save(video);
         return  true;
     }

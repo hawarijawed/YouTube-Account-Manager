@@ -1,8 +1,6 @@
 package com.YoutubeAccount.Manager.models;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,20 +9,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Document(collection = "video")
-public class VideoManagement {
+@Document(collection = "comments")
+
+public class Comments {
     @Id
     private String id;
-    private String youtubeAccountId; //YoutubeAccount -> id
-    private String title;
-    private String description;
-    private long views=0;
-    private long likes=0;
-    private long dislikes=0;
+    private String videoId;//Reference from VideoManagement.id
+    private String userId;
+    private String text;
+    private long likedComments = 0;
+    private long dislikedComments = 0;
+
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
 }

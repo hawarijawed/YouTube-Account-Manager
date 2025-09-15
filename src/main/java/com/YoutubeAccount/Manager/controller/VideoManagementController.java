@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.ResourceBundle;
 
-@Controller
-@RequestMapping("/video")
+@RestController
+@RequestMapping("/api/video")
 public class VideoManagementController {
     @Autowired
     private final VideoManagementServices videoManagementServices;
@@ -53,9 +53,8 @@ public class VideoManagementController {
             return new ResponseEntity<>(video, HttpStatus.CREATED);
         }
 
-        return new ResponseEntity<>("Account not found", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Account not found or video with same idea uploaded", HttpStatus.BAD_REQUEST);
     }
-
 
 }
 

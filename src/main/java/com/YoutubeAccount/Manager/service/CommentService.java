@@ -1,0 +1,111 @@
+package com.YoutubeAccount.Manager.service;
+
+import com.YoutubeAccount.Manager.models.Comments;
+import com.YoutubeAccount.Manager.repositories.CommentRepository;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
+
+import javax.xml.stream.events.Comment;
+import java.util.List;
+
+@Service
+public class CommentService {
+
+    private final CommentRepository commentRepository;
+    private final MongoTemplate mongoTemplate;
+    public CommentService(CommentRepository comment, MongoTemplate template){
+        this.commentRepository = comment;
+        this.mongoTemplate = template;
+    }
+
+    //Add comment
+    public boolean addComment(Comments comment){
+        if(comment.getText() == null || comment.getUserId() == null || comment.getVideoId() == null){
+            return false;
+        }
+
+        commentRepository.save(comment);
+        return  true;
+    }
+
+    //Get all comments;
+    public List<Comments> getAllComments(){
+        return commentRepository.findAll();
+    }
+
+    //Get comments of particular user
+    public List<Comments> getUserComments(String userId){
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new IllegalArgumentException("userId must not be null or empty");
+        }
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userId").is(userId));
+        return mongoTemplate.find(query, Comments.class);
+    }
+
+    //Get all comments on a video
+    public List<Comments> getVideoComments(String videoId){
+        if(videoId == null || videoId.trim().isEmpty()){
+            throw new IllegalArgumentException("Video id must not be null");
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("videoId").is(videoId));
+        return mongoTemplate.find(query, Comments.class);
+    }
+
+    //Like the comment
+    public boolean likeComment(String id){
+        Comments comments = commentRepository.findById(id).orElse(null);
+        if(comments == null)
+            return false;
+        comments.setLikedComments(comments.getLikedComments()+1);
+        commentRepository.save(comments);
+        return true;
+    }
+
+    //Dislike the comment
+    public boolean dislikeComment(String id){
+        Comments comments = commentRepository.findById(id).orElse(null);
+        if(comments == null)
+            return false;
+        comments.setDislikedComments(comments.getDislikedComments()+1);
+        commentRepository.save(comments);
+        return true;
+    }
+
+    //Delete comment by Id
+    public boolean deleteById(String id){
+        if(!commentRepository.existsById(id)){
+            return  false;
+        }
+        commentRepository.deleteById(id);
+        return true;
+    }
+
+    //Delete all the comments over a video
+    public boolean deleteAllComments(String videoId){
+        if(!commentRepository.existsById(videoId)){
+            return false;
+        }
+        Query query = new Query();
+        query.addCriteria(Criteria.where("videoId").is(videoId));
+        mongoTemplate.remove(query, Comments.class);
+        return true;
+    }
+
+    //Delete/Report a particular user comment
+    public boolean deleteUserComment(String userId){
+        if(!commentRepository.existsById(userId)){
+            return false;
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userId").is(userId));
+        mongoTemplate.remove(query, Comments.class);
+        return true;
+    }
+
+}
