@@ -55,7 +55,10 @@ public class CommentService {
         query.addCriteria(Criteria.where("videoId").is(videoId));
         return mongoTemplate.find(query, Comments.class);
     }
-
+    //Get comment with specific id
+    public Comments getCommentById(String id){
+        return commentRepository.findById(id).orElse(null);
+    }
     //Like the comment
     public boolean likeComment(String id){
         Comments comments = commentRepository.findById(id).orElse(null);
@@ -106,6 +109,16 @@ public class CommentService {
         query.addCriteria(Criteria.where("userId").is(userId));
         mongoTemplate.remove(query, Comments.class);
         return true;
+    }
+
+    //Update Comment
+    public Comments updateComments(Comments comment){
+        if(comment.getText() == null) return null;
+        Comments comments = commentRepository.findById(comment.getId()).orElse(null);
+        if(comments == null) return null;
+        comments.setText(comment.getText());
+        commentRepository.save(comments);
+        return comments;
     }
 
 }
