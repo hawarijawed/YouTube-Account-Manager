@@ -2,35 +2,66 @@ package com.YoutubeAccount.Manager.controller;
 
 import com.YoutubeAccount.Manager.models.Users;
 import com.YoutubeAccount.Manager.service.CreaterService;
+import com.YoutubeAccount.Manager.service.UserDetailsImpl;
+import com.YoutubeAccount.Manager.utility.JwtUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class CreatorController {
     @Autowired
     private CreaterService createrService;
-
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private UserDetailsImpl userDetails;
+    @Autowired
+    private JwtUtils jwtUtils;
     @GetMapping("/greet/{name}")
     public ResponseEntity<String> gretting(@PathVariable String name){
         String greet_msg = createrService.greet();
         return new ResponseEntity<>(greet_msg+name, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    //@PostMapping("/add")
+    @PostMapping("/signup")
     public boolean AddUser(@RequestBody Users user){
         boolean flag = createrService.saveUser(user);
         return flag;
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody Users user){
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
+            UserDetails details = userDetails.loadUserByUsername(user.getUsername());
+            log.info("Registered user details :"+details);
+            String jwtToken = jwtUtils.generateToken(details.getUsername());
+            return new ResponseEntity<>(jwtToken, HttpStatus.ACCEPTED);
+        } catch (AuthenticationException e) {
+            log.info("**** Error occurred during login:  {} *****", e);
+            return new ResponseEntity<>("Incorrect email or password", HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllUsers(){
+        log.info("Authorities: " + userDetails.toString());
+
         List<Users>  user = createrService.getAllUsers();
         if(!user.isEmpty()) {
             return new ResponseEntity<>(user, HttpStatus.FOUND);

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -18,10 +19,12 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class CreaterService {
-    @Autowired
+
     private final UserRepository userRepository;
-    public CreaterService(UserRepository userRepository){
+    private final PasswordEncoder passwordEncoder;
+    public CreaterService(UserRepository userRepository, PasswordEncoder encoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = encoder;
     }
 
     public boolean saveUser (Users user){
@@ -29,6 +32,7 @@ public class CreaterService {
             log.warn("User with id {} already exists ",user.getId());
             return false;
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         Optional<Users> use = userRepository.findById(user.getId());
         if(!use.isEmpty()){
