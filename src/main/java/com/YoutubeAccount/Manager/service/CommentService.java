@@ -1,6 +1,8 @@
 package com.YoutubeAccount.Manager.service;
 
+import com.YoutubeAccount.Manager.models.CommentReaction;
 import com.YoutubeAccount.Manager.models.Comments;
+import com.YoutubeAccount.Manager.repositories.CommentReactionRepository;
 import com.YoutubeAccount.Manager.repositories.CommentRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,9 +17,16 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final MongoTemplate mongoTemplate;
-    public CommentService(CommentRepository comment, MongoTemplate template){
+    private final CommentReactionRepository commentReactionRepository;
+    private final CommentReactionService commentReactionService;
+    public CommentService(CommentRepository comment,
+                          MongoTemplate template,
+                          CommentReactionRepository commentReactionRepository,
+                          CommentReactionService commentReactionService){
         this.commentRepository = comment;
         this.mongoTemplate = template;
+        this.commentReactionRepository = commentReactionRepository;
+        this.commentReactionService = commentReactionService;
     }
 
     //Add comment
@@ -25,7 +34,6 @@ public class CommentService {
         if(comment.getText() == null || comment.getUserId() == null || comment.getVideoId() == null){
             return false;
         }
-
         commentRepository.save(comment);
         return  true;
     }
@@ -60,12 +68,17 @@ public class CommentService {
         return commentRepository.findById(id).orElse(null);
     }
     //Like the comment
-    public boolean likeComment(String id){
-        Comments comments = commentRepository.findById(id).orElse(null);
+    public boolean likeComment(String commentId, String userId){
+        Comments comments = commentRepository.findById(commentId).orElse(null);
         if(comments == null)
             return false;
-        comments.setLikedComments(comments.getLikedComments()+1);
-        commentRepository.save(comments);
+
+        CommentReaction reaction = new CommentReaction();
+        reaction.setCommentId(commentId);
+        reaction.setUserId(userId);
+        reaction.setType("LIKE");
+        commentReactionService.addCommentReaction(reaction);
+
         return true;
     }
 

@@ -30,13 +30,11 @@ public class SpringSecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**").permitAll()
-                                .requestMatchers("/api/user/login").permitAll()
+                        .requestMatchers("/api/user/login", "/api/user/signup").permitAll()
                         .requestMatchers("/api/user/**").authenticated()
                         .requestMatchers("/api/video/**").authenticated()
                         .requestMatchers("/api/youtubeaccount/**").authenticated()
                         .requestMatchers("/api/comments/**").authenticated()
-
-
                 )
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Important for JWT

@@ -1,21 +1,34 @@
 package com.YoutubeAccount.Manager.controller;
 
 import com.YoutubeAccount.Manager.models.Comments;
+import com.YoutubeAccount.Manager.models.Users;
+import com.YoutubeAccount.Manager.repositories.UserRepository;
 import com.YoutubeAccount.Manager.service.CommentService;
+import com.YoutubeAccount.Manager.service.UserDetailsImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/comments")
 public class CommentsController {
 
     private final CommentService commentService;
-    public CommentsController(CommentService commentService){
+    private final UserRepository userRepository;
+    public CommentsController(CommentService commentService, UserRepository userRepository){
         this.commentService = commentService;
+        this.userRepository = userRepository;
     }
 
     //Add comment
@@ -62,7 +75,11 @@ public class CommentsController {
     //Like the comment
     @PutMapping("/like/{id}")
     public ResponseEntity<String> likeComment(@PathVariable String id){
-        boolean flag = commentService.likeComment(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username =  auth.getName();
+        Users user = userRepository.getUserByusername(username);
+
+        boolean flag = commentService.likeComment(id, user.getId());
         if(flag){
             return new ResponseEntity<>("You liked the comment", HttpStatus.OK);
         }
