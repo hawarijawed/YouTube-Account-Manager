@@ -24,47 +24,59 @@ public class CommentReactionService {
     }
 
     //Add comment reaction
-    public boolean addCommentReaction(CommentReaction reaction){
-        CommentReaction existing = commentReactionRepository.findByCommentIdAndUserId(reaction.getCommentId(), reaction.getUserId());
+    public boolean addCommentReaction(CommentReaction reaction) {
+        // Fetch existing reaction from the same user on the same comment
+        CommentReaction existing = commentReactionRepository.findByCommentIdAndUserId(
+                reaction.getCommentId(),
+                reaction.getUserId()
+        );
+
+        // Fetch the actual comment
         Comments comments = commentRepository.findById(reaction.getCommentId()).orElse(null);
-        if(comments == null) return false;
-        if(existing != null){
-            if(existing.getType().equals(reaction.getType())){
+        if (comments == null) return false;
+
+        if (existing != null) {
+            if (existing.getType().equals(reaction.getType())) {
+                // ✅ Toggle: user clicked same reaction again (e.g., LIKE → LIKE)
                 commentReactionRepository.delete(existing);
-                if(reaction.getType().equals("LIKE")){
-                    //Unsetting the count of likedComments
-                    comments.setLikedComments(comments.getLikedComments()>0?comments.getLikedComments()-1:0);
+
+                if ("LIKE".equals(reaction.getType())) {
+                    comments.setLikedComments(Math.max(0, comments.getLikedComments() - 1));
+                } else {
+                    comments.setDislikedComments(Math.max(0, comments.getDislikedComments() - 1));
                 }
-                else{
-                    //Unsetting the count of disliked comments
-                    comments.setDislikedComments(comments.getDislikedComments()>0?comments.getDislikedComments()-1:0);
+
+            } else {
+                // ✅ Switch: user changed reaction type (e.g., LIKE → DISLIKE)
+                if ("LIKE".equals(reaction.getType())) {
+                    comments.setLikedComments(comments.getLikedComments() + 1);
+                    comments.setDislikedComments(Math.max(0, comments.getDislikedComments() - 1));
+                } else {
+                    comments.setDislikedComments(comments.getDislikedComments() + 1);
+                    comments.setLikedComments(Math.max(0, comments.getLikedComments() - 1));
                 }
-            }
-            else{
+
                 existing.setType(reaction.getType());
                 commentReactionRepository.save(existing);
-                if(reaction.getType().equals("LIKE")){
-                    comments.setLikedComments(comments.getLikedComments()+1);
-                }
-                else{
-                    comments.setDislikedComments(comments.getDislikedComments()+1);
-                }
             }
-        }
-        else {
+
+        } else {
+            // ✅ New reaction
             commentReactionRepository.save(reaction);
-            if(reaction.getType().equals("LIKE")){
-                comments.setLikedComments(comments.getLikedComments()+1);
-            }
-            else{
-                comments.setDislikedComments(comments.getDislikedComments()+1);
+
+            if ("LIKE".equals(reaction.getType())) {
+                comments.setLikedComments(comments.getLikedComments() + 1);
+            } else {
+                comments.setDislikedComments(comments.getDislikedComments() + 1);
             }
         }
+
+        // Save updated comment counts
         commentRepository.save(comments);
-        commentReactionRepository.save(reaction);
 
         return true;
     }
+
 
     public void removeReaction(String commentId){
         Query query = new Query();

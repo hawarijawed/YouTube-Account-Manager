@@ -79,7 +79,7 @@ public class CommentsController {
         String username =  auth.getName();
         Users user = userRepository.getUserByusername(username);
 
-        boolean flag = commentService.likeComment(id, user.getId());
+        boolean flag = commentService.likeDisLikeComment(id, user.getId(),"LIKE");
         if(flag){
             return new ResponseEntity<>("You liked the comment", HttpStatus.OK);
         }
@@ -89,7 +89,11 @@ public class CommentsController {
     //Dislike the comment
     @PutMapping("/dislike/{id}")
     public ResponseEntity<String> dislikeComment(@PathVariable String id){
-        boolean flag = commentService.dislikeComment(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        Users user = userRepository.getUserByusername(username);
+
+        boolean flag = commentService.likeDisLikeComment(id, user.getId(),"DISLIKE");
         if(flag){
             return new ResponseEntity<>("You disliked the comment", HttpStatus.OK);
         }

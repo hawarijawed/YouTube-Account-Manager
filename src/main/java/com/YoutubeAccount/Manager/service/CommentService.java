@@ -68,27 +68,44 @@ public class CommentService {
         return commentRepository.findById(id).orElse(null);
     }
     //Like the comment
-    public boolean likeComment(String commentId, String userId){
+//    public boolean likeComment(String commentId, String userId){
+//        Comments comments = commentRepository.findById(commentId).orElse(null);
+//        if(comments == null)
+//            return false;
+//
+//        CommentReaction reaction = new CommentReaction();
+//        reaction.setCommentId(commentId);
+//        reaction.setUserId(userId);
+//        reaction.setType("LIKE");
+//        commentReactionService.addCommentReaction(reaction);
+//
+//        return true;
+//    }
+//
+//    //Dislike the comment
+//    public boolean dislikeComment(String commentId, String userId){
+//        Comments comments = commentRepository.findById(commentId).orElse(null);
+//        if(comments == null)
+//            return false;
+//        CommentReaction reaction = new CommentReaction();
+//        reaction.setUserId(userId);
+//        reaction.setCommentId(commentId);
+//        reaction.setType("DISLIKE");
+//
+//        commentReactionService.addCommentReaction(reaction);
+//        return true;
+//    }
+
+    public boolean likeDisLikeComment(String commentId, String userId, String type){
         Comments comments = commentRepository.findById(commentId).orElse(null);
         if(comments == null)
             return false;
-
         CommentReaction reaction = new CommentReaction();
-        reaction.setCommentId(commentId);
         reaction.setUserId(userId);
-        reaction.setType("LIKE");
+        reaction.setCommentId(commentId);
+        reaction.setType(type);
+
         commentReactionService.addCommentReaction(reaction);
-
-        return true;
-    }
-
-    //Dislike the comment
-    public boolean dislikeComment(String id){
-        Comments comments = commentRepository.findById(id).orElse(null);
-        if(comments == null)
-            return false;
-        comments.setDislikedComments(comments.getDislikedComments()+1);
-        commentRepository.save(comments);
         return true;
     }
 
