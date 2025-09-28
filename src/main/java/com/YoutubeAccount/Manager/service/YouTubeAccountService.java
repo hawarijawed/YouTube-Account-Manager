@@ -1,26 +1,30 @@
 package com.YoutubeAccount.Manager.service;
 
+import com.YoutubeAccount.Manager.models.Users;
 import com.YoutubeAccount.Manager.models.YouTubeAccount;
 import com.YoutubeAccount.Manager.repositories.UserRepository;
 import com.YoutubeAccount.Manager.repositories.YouTubeAccountRespository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Slf4j
 @Service
 public class YouTubeAccountService {
-    @Autowired
+
     private final YouTubeAccountRespository youTubeAccountRespository;
-
-    @Autowired
     private final UserRepository userRepository;
-
-    public YouTubeAccountService(YouTubeAccountRespository youTubeAccountRespository, UserRepository userRepository){
+    private final SubscriptionService subscriptionService;
+    public YouTubeAccountService(YouTubeAccountRespository youTubeAccountRespository,
+                                 UserRepository userRepository,
+                                 SubscriptionService subscriptionService){
         this.youTubeAccountRespository = youTubeAccountRespository;
         this.userRepository = userRepository;
+        this.subscriptionService = subscriptionService;
     }
 
     //Create account
@@ -66,12 +70,15 @@ public class YouTubeAccountService {
 
     //Subscribe channel
     public boolean subscribe(String id){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
         YouTubeAccount account = youTubeAccountRespository.findById(id).orElse(null);
+
         if(account == null){
             return false;
         }
-        account.setSubscribers(account.getSubscribers()+1);
-        youTubeAccountRespository.save(account);
+        subscriptionService.addSubscription(id, username);
         return true;
     }
 

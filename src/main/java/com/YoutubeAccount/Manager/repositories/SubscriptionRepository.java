@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SubscriptionRepository extends MongoRepository<Subscription, String> {
-
+    Subscription findByChannelIdAndUserId(String channelId, String userId);
 }
