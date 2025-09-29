@@ -1,6 +1,8 @@
 package com.YoutubeAccount.Manager.service;
 
+import com.YoutubeAccount.Manager.models.Users;
 import com.YoutubeAccount.Manager.models.VideoManagement;
+import com.YoutubeAccount.Manager.repositories.UserRepository;
 import com.YoutubeAccount.Manager.repositories.VideoManagementRepository;
 import com.YoutubeAccount.Manager.repositories.YouTubeAccountRespository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,21 +10,29 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
 public class VideoManagementServices {
-    @Autowired
+
     private final VideoManagementRepository videoManagementRepository;
-    @Autowired
     private final YouTubeAccountRespository youTubeAccountRespository;
-    @Autowired
     private final MongoTemplate mongoTemplate;
-    public VideoManagementServices(VideoManagementRepository video, MongoTemplate template, YouTubeAccountRespository youtube){
+    private final UserRepository userRepository;
+    private final VideoReactionService videoReactionService;
+    public VideoManagementServices(VideoManagementRepository video,
+                                   MongoTemplate template,
+                                   YouTubeAccountRespository youtube,
+                                   UserRepository userRepository,
+                                   VideoReactionService videoReactionService){
         this.videoManagementRepository = video;
         this.mongoTemplate = template;
         this.youTubeAccountRespository = youtube;
+        this.userRepository = userRepository;
+        this.videoReactionService = videoReactionService;
     }
 
     public boolean saveVideo(VideoManagement video){
@@ -63,25 +73,16 @@ public class VideoManagementServices {
         mongoTemplate.remove(query, VideoManagement.class);
         return true;
     }
-    public boolean likeVideo(String id){
-        VideoManagement video = videoManagementRepository.findById(id).orElse(null);
-        if(video == null){
-            return  false;
-        }
-        video.setLikes(video.getLikes()+1);
-        videoManagementRepository.save(video);
-        return true;
+
+    public String likeDislikeVideo(String videoId, String type){
+        VideoManagement video = videoManagementRepository.findById(videoId).orElseThrow();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        Users user = userRepository.getUserByusername(username);
+        return videoReactionService.saveVideoReaction(videoId, user.getId(), type);
     }
 
-    public boolean disLikeVideo(String id){
-        VideoManagement video = videoManagementRepository.findById(id).orElse(null);
-        if(video == null){
-            return  false;
-        }
-        video.setDislikes(video.getDislikes()+1);
-        videoManagementRepository.save(video);
-        return true;
-    }
 
     public boolean viewVideo(String id){
         VideoManagement video = videoManagementRepository.findById(id).orElse(null);

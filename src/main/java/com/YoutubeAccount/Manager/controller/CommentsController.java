@@ -79,11 +79,8 @@ public class CommentsController {
         String username =  auth.getName();
         Users user = userRepository.getUserByusername(username);
 
-        boolean flag = commentService.likeDisLikeComment(id, user.getId(),"LIKE");
-        if(flag){
-            return new ResponseEntity<>("You liked the comment", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Comment not found", HttpStatus.BAD_REQUEST);
+        String result = commentService.likeDisLikeComment(id, user.getId(),"LIKE");
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     //Dislike the comment
@@ -93,11 +90,8 @@ public class CommentsController {
         String username = auth.getName();
         Users user = userRepository.getUserByusername(username);
 
-        boolean flag = commentService.likeDisLikeComment(id, user.getId(),"DISLIKE");
-        if(flag){
-            return new ResponseEntity<>("You disliked the comment", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Comment not found", HttpStatus.BAD_REQUEST);
+        String result = commentService.likeDisLikeComment(id, user.getId(),"DISLIKE");
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     //Delete comment by Id

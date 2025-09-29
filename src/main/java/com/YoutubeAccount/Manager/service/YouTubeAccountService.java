@@ -69,17 +69,13 @@ public class YouTubeAccountService {
     }
 
     //Subscribe channel
-    public boolean subscribe(String id){
+    public String subscribe(String id){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
-        YouTubeAccount account = youTubeAccountRespository.findById(id).orElse(null);
+        String response = subscriptionService.addSubscription(id, username);
 
-        if(account == null){
-            return false;
-        }
-        subscriptionService.addSubscription(id, username);
-        return true;
+        return response;
     }
 
 }

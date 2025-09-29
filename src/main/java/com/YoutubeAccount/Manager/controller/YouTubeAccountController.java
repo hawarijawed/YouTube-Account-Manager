@@ -56,11 +56,11 @@ public class YouTubeAccountController {
 
     @PutMapping("/subscribe/{id}")
     public ResponseEntity<String> subscribeChannel(@PathVariable String id){
-        boolean flag = youTubeAccountService.subscribe(id);
-        if(!flag){
-            return new ResponseEntity<>("Account not found", HttpStatus.BAD_REQUEST);
+        String result = youTubeAccountService.subscribe(id);
+        if (result.startsWith("✅") || result.startsWith("🔔")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.badRequest().body(result);
         }
-        String message = "You Subscribed "+youTubeAccountService.findByAccountId(id).getChannelName();
-        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }

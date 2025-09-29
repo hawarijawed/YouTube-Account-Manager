@@ -56,5 +56,19 @@ public class VideoManagementController {
         return new ResponseEntity<>("Account not found or video with same idea uploaded", HttpStatus.BAD_REQUEST);
     }
 
+    @PutMapping("/like/{videoId}")
+    public String likeVideo(@PathVariable String videoId){
+        String response = videoManagementServices.likeDislikeVideo(videoId, "LIKE");
+
+        return response;
+    }
+
+    @PutMapping("/dislike/{videoId}")
+    public String dislikeVideo(@PathVariable String videoId){
+        String flag = videoManagementServices.likeDislikeVideo(videoId, "DISLIKE");
+
+        return flag;
+    }
+
 }
 

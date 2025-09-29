@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VideoReactionRepository extends MongoRepository<VideoReaction, String> {
-
+    VideoReaction findByVideoIdAndUserId(String videoId, String userId);
 }

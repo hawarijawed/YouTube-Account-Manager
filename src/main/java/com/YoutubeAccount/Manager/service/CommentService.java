@@ -96,17 +96,13 @@ public class CommentService {
 //        return true;
 //    }
 
-    public boolean likeDisLikeComment(String commentId, String userId, String type){
-        Comments comments = commentRepository.findById(commentId).orElse(null);
-        if(comments == null)
-            return false;
+    public String likeDisLikeComment(String commentId, String userId, String type){
         CommentReaction reaction = new CommentReaction();
         reaction.setUserId(userId);
         reaction.setCommentId(commentId);
         reaction.setType(type);
 
-        commentReactionService.addCommentReaction(reaction);
-        return true;
+        return commentReactionService.addCommentReaction(reaction);
     }
 
     //Delete comment by Id
